@@ -16,6 +16,17 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+# proj
+*.config
+*.csproj
+*.csproj.user
+*.v12.suo
+*.mdf
+*.png
+*.resx
+*.designer.cs
+*.settings
+*.manifest
 
 # =========================
 # Operating System Files
