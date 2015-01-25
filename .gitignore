@@ -27,8 +27,8 @@ $RECYCLE.BIN/
 *.designer.cs
 *.settings
 *.manifest
-.bin
-.obj
+bin
+obj
 
 # =========================
 # Operating System Files
