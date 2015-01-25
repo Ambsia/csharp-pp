@@ -129,16 +129,16 @@ namespace PasswordProtector
         }
 
         private bool FetchWebsiteFavicon(string websiteAddress, string fileSavePath)
-        {//\@[a-zA-Z0-9]\.
-            //Regex websiteValidati = new Regex(@"^([a-zA-Z0-9]{4,})+\@[a-z]{3,}\..[.a-z]{1,4}$");
-            //if ()
-           // string usualFaviconLocation = @"http://www." + websiteAddress +
-            //write  code to find favicon
+        {
+
+
             WebRequest.DefaultWebProxy = null;
-            //string faviconGrab = string.Format(@"http://getfavicon.appspot.com/{0}", websiteAddress);
+          //  string faviconGrab = string.Format(@"http://getfavicon.appspot.com/{0}", websiteAddress);
            // string faviconGrab = string.Format(websiteAddress + "favicon.ico");
-            //string faviconGrab = string.Format(@"http://www.google.com/s2/favicons?domain={0}", websiteAddress);
-            string faviconGrab = string.Format(@"http://grabicon.com/", websiteAddress);
+           // string faviconGrab = string.Format(@"http://www.google.com/s2/favicons?domain={0}", websiteAddress);
+            //string faviconGrab = string.Format(@"http://grabicon.com/", websiteAddress);
+
+            string faviconGrab = string.Format(@"http://grabicon.com/icon?domain={0}&size=36", websiteAddress);
             if (File.Exists(fileSavePath))
             { 
                 return true;

@@ -240,6 +240,10 @@ namespace PasswordProtector
                 {
                     MessageDialog.ErrorMessageBox("Username and password both need to be over 5 characters long.");
                 }
+                else if (validate.ValidateWebsiteAddress())
+                {
+                    MessageDialog.ErrorMessageBox("Website address could not be validated");
+                }
                 else
                 {
                     newCredential.AddCredential(account.AccountID); // inserts account into database then adds account to credential list 
@@ -832,10 +836,11 @@ namespace PasswordProtector
                 MessageDialog.ErrorMessageBox("Incorrect paasword, please try again.");
         }
 
-        private void lvUserCredentials_SelectedIndexChanged(object sender, EventArgs e)
+        private void groupBox1_Enter(object sender, EventArgs e)
         {
 
         }
+
 
     }
 }

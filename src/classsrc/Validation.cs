@@ -84,6 +84,12 @@ namespace PasswordProtector
             }
         }
 
+        public bool ValidateWebsiteAddress()
+        {
+            regex = new Regex(@"^[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(/\S*)?$");
+
+            return regex.IsMatch(credential.WebsiteAssociate);
+        }
 
         public bool InvalidCharacters()
         {

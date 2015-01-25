@@ -31,7 +31,7 @@ namespace PasswordProtector
             //{
             dataHandle.UserName = txtUserName.Text;
             dataHandle.UserPassword = txtPassword.Text;
-            dataHandle.WebsiteAssociate = "http://" + txtWebsite.Text;
+            dataHandle.WebsiteAssociate = txtWebsite.Text;
             dataHandle.DateAdded = DateTime.Now;
             dataHandle.DateModified = DateTime.Now;
             // }
@@ -63,6 +63,11 @@ namespace PasswordProtector
         {
             dataHandle = null;
             this.Dispose();
+        }
+
+        private void frmNewCredential_Load(object sender, EventArgs e)
+        {
+
         }
 
     }
