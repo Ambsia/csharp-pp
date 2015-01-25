@@ -240,7 +240,7 @@ namespace PasswordProtector
                 {
                     MessageDialog.ErrorMessageBox("Username and password both need to be over 5 characters long.");
                 }
-                else if (validate.ValidateWebsiteAddress())
+                else if (!validate.ValidateWebsiteAddress())
                 {
                     MessageDialog.ErrorMessageBox("Website address could not be validated");
                 }
@@ -262,6 +262,7 @@ namespace PasswordProtector
 
                     imageList1.Images.Add(newCredential.GetImage(userCredentials.GetSizeOfList() - 1));
                     item.ImageIndex = (lvUserCredentials.Items.Count - 1);
+                    RecalImageListIndex();
                 }
                 RecolourListView();
             }
@@ -594,15 +595,12 @@ namespace PasswordProtector
         }
         private void cmbAutoBox_SelectionChangeCommitted(object sender, EventArgs e)
         {
-
             List<String> listOfRandomWebsites = new List<String>();
             listOfRandomWebsites.Add("http://outlook.com");
             listOfRandomWebsites.Add("http://amazon.com");
             listOfRandomWebsites.Add("http://reddit.com");
             listOfRandomWebsites.Add("http://google.com");
             listOfRandomWebsites.Add("http://torn.com");
-
-
 
             switch (cmbAutoBox.SelectedIndex)
             {
@@ -837,6 +835,11 @@ namespace PasswordProtector
         }
 
         private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lvUserCredentials_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }

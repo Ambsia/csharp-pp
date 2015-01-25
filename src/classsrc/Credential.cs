@@ -130,15 +130,13 @@ namespace PasswordProtector
 
         private bool FetchWebsiteFavicon(string websiteAddress, string fileSavePath)
         {
-
-
             WebRequest.DefaultWebProxy = null;
           //  string faviconGrab = string.Format(@"http://getfavicon.appspot.com/{0}", websiteAddress);
            // string faviconGrab = string.Format(websiteAddress + "favicon.ico");
            // string faviconGrab = string.Format(@"http://www.google.com/s2/favicons?domain={0}", websiteAddress);
             //string faviconGrab = string.Format(@"http://grabicon.com/", websiteAddress);
 
-            string faviconGrab = string.Format(@"http://grabicon.com/icon?domain={0}&size=36", websiteAddress);
+            string faviconGrab = string.Format(@"http://grabicon.com/icon?domain={0}&size=46", websiteAddress);
             if (File.Exists(fileSavePath))
             { 
                 return true;
@@ -180,18 +178,19 @@ namespace PasswordProtector
 
         private Image GetFavicon()
         {
-            string iconSaveName = "";
+            //string iconSaveName = "";
             string iconFilePath = "";
 
         
             // Environment.CurrentDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             DirectoryInfo info = new DirectoryInfo(@".\src\Favicons\");
-            if (websiteAssociate.Length > 7)
+            /*if (websiteAssociate.Length > 7)
             {
                 iconSaveName = websiteAssociate.Remove(0, 7);
 
                 iconFilePath = string.Format(@"{0}{1}.png",info.FullName, iconSaveName);
-            }
+            }*/
+            iconFilePath = string.Format(@"{0}{1}.png", info.FullName,this.websiteAssociate);
             if (FetchWebsiteFavicon(websiteAssociate, iconFilePath))
             {
                 try
@@ -263,6 +262,7 @@ namespace PasswordProtector
             {
                 using (SqlConnection sqlConnection = new SqlConnection(frmMain.GetSqlConnectionString().ConnectionString))
                 {
+                    Image favicon;
                     sqlConnection.Open();
                     using (SqlCommand sqlCommand = new SqlCommand("Insert into Credential (Username,Password,UserID,pinProtection,Type,DateAdded,DateModified,WebsiteAssociate,WebsiteFavicon)" +
                         "VALUES (@Username, @Password, @UserID, @PinProtection, @Type, @DateAdded, @DateModified, @WebsiteAssociate, @WebsiteFavicon) SELECT SCOPE_IDENTITY()", sqlConnection))
@@ -272,6 +272,8 @@ namespace PasswordProtector
                         string encryptedusername = Cryptography.Encrypt(userName, Convert.ToString(Convert.ToInt32(accountId) * 3109));
                         string encryptedpass = Cryptography.Encrypt(password, Convert.ToString(Convert.ToInt32(accountId) * 3109));
 
+                        favicon = GetFavicon();
+
                         sqlCommand.Parameters.Add(new SqlParameter("@Username", encryptedusername));
                         sqlCommand.Parameters.Add(new SqlParameter("@Password", encryptedpass));
                         sqlCommand.Parameters.Add(new SqlParameter("@UserID", accountId));
@@ -280,11 +282,11 @@ namespace PasswordProtector
                         sqlCommand.Parameters.Add(new SqlParameter("@DateAdded", dateAdded.ToString("MMMM dd, yyyy")));
                         sqlCommand.Parameters.Add(new SqlParameter("@DateModified", dateModified.ToString("MMMM dd, yyyy")));
                         sqlCommand.Parameters.Add(new SqlParameter("@WebsiteAssociate", websiteAssociate));
-                        sqlCommand.Parameters.Add(new SqlParameter("@WebsiteFavicon", ImageToByteArray(GetFavicon())));
+                        sqlCommand.Parameters.Add(new SqlParameter("@WebsiteFavicon", ImageToByteArray(favicon)));
                         this.userID = sqlCommand.ExecuteScalar();
                         sqlConnection.Close();  
                     }
-                    listOfCredentials.Add(new Tuple<Credential, Image>(this, GetFavicon()));  
+                    listOfCredentials.Add(new Tuple<Credential, Image>(this, favicon));  
                 }
             }
             catch (Exception e)
