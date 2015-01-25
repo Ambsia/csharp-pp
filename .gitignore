@@ -29,6 +29,8 @@ $RECYCLE.BIN/
 *.manifest
 bin
 obj
+Properties
+Database Files
 
 # =========================
 # Operating System Files
