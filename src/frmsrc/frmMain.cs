@@ -10,7 +10,7 @@ using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using System.IO;
 
-namespace WindowsFormsApplication1
+namespace PasswordProtector
 {
     // author: Alex Boseley
     public partial class frmMain : Form

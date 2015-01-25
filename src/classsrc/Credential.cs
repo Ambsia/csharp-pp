@@ -12,13 +12,12 @@ using System.IO;
 using System.Net;
 
 
-namespace WindowsFormsApplication1
+namespace PasswordProtector
 {
     
     public class Credential : IEnumerable<Tuple<Credential, Image>>
     {
-        private static List<Tuple<Credential, Image>> listOfCredentials = new List<Tuple<Credential,Image>>();
-        
+        private static List<Tuple<Credential, Image>> listOfCredentials = new List<Tuple<Credential,Image>>();      
 
         private object accountId;
         private object userID;
@@ -40,19 +39,6 @@ namespace WindowsFormsApplication1
             this.dateAdded = DateTime.Now;
             this.dateModified = DateTime.Now;
             this.websiteAssociate = "";
-        }
-
-        public Credential(object userID, string userName, string password, string type, bool pinProtection, DateTime dateAdded, DateTime dateModified, object accountID, string websiteAssociate)
-        {
-            this.userID = userID;
-            this.userName = userName;
-            this.password = password;
-            this.type = type;
-            this.pinProtection = pinProtection;
-            this.dateAdded = dateAdded;
-            this.dateModified = dateModified;
-            this.websiteAssociate = websiteAssociate;
-            this.accountId = accountID;
         }
 
         public IEnumerator<Tuple<Credential, Image>> GetEnumerator()

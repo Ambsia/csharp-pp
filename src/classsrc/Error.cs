@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using System.Data.SqlClient;
 using System.Configuration;
 
-namespace WindowsFormsApplication1
+namespace PasswordProtector
 {
     class Error
     {

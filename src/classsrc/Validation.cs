@@ -10,7 +10,7 @@ using System.Configuration;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 
-namespace WindowsFormsApplication1
+namespace PasswordProtector
 {
     public class Validation
     {

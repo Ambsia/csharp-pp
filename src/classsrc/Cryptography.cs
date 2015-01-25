@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace WindowsFormsApplication1
+namespace PasswordProtector
 {
     public static class Cryptography {
         #region Settings
@@ -16,7 +16,6 @@ namespace WindowsFormsApplication1
         private static string _vector   = "nv'n=cn-fsff2312"; // Random
 
         #endregion
-
         public static string Encrypt(string value, string key) {
             return Encrypt<AesManaged>(value, key);
         }

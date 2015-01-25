@@ -12,7 +12,7 @@ using System.Net;
 using System.IO;
 using System.Collections.Specialized;
 
-namespace WindowsFormsApplication1
+namespace PasswordProtector
 {
     public partial class frmDashBoard : Form
     {

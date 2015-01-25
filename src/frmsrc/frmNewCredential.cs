@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 
-namespace WindowsFormsApplication1
+namespace PasswordProtector
 {
     public partial class frmNewCredential : Form
     {
