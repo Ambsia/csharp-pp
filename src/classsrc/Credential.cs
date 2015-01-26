@@ -1,23 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 using System.Data.SqlClient;
-using System.Text.RegularExpressions;
+using System.Drawing;
 using System.IO;
 using System.Net;
-
+using System.Windows.Forms;
 
 namespace PasswordProtector
 {
-    
+
     public class Credential : IEnumerable<Tuple<Credential, Image>>
     {
-        private static List<Tuple<Credential, Image>> listOfCredentials = new List<Tuple<Credential,Image>>();      
+        private static List<Tuple<Credential, Image>> listOfCredentials = new List<Tuple<Credential, Image>>();
 
         private object accountId;
         private object userID;
@@ -29,7 +23,8 @@ namespace PasswordProtector
         private DateTime dateModified;     //                            //
         private string websiteAssociate;
 
-        public Credential()    {
+        public Credential()
+        {
             this.accountId = "";
             this.userID = "";
             this.userName = "";
@@ -54,7 +49,7 @@ namespace PasswordProtector
         public object UserID
         {
             get { return userID; }
-            set { userID = value;  }
+            set { userID = value; }
         }
         public string UserName
         {
@@ -62,7 +57,7 @@ namespace PasswordProtector
             set { userName = value; }
         }
 
-        public string UserPassword 
+        public string UserPassword
         {
             get { return password; }
             set { password = value; }
@@ -103,7 +98,7 @@ namespace PasswordProtector
             return listOfCredentials.Count;
         }
 
-        public Tuple<Credential,Image> GetCredential(int index)
+        public Tuple<Credential, Image> GetCredential(int index)
         {
             Tuple<Credential, Image> credential = null;
             if (index < 0 || index > listOfCredentials.Count)
@@ -128,38 +123,79 @@ namespace PasswordProtector
             }
         }
 
+
+        //  string faviconGrab = string.Format(@"http://getfavicon.appspot.com/{0}", websiteAddress);
+        // string faviconGrab = string.Format(websiteAddress + "favicon.ico");
+        // string faviconGrab = string.Format(@"http://www.google.com/s2/favicons?domain={0}", websiteAddress);
+        //string faviconGrab = string.Format(@"http://grabicon.com/", websiteAddress);
+
+
         private bool FetchWebsiteFavicon(string websiteAddress, string fileSavePath)
         {
             WebRequest.DefaultWebProxy = null;
-          //  string faviconGrab = string.Format(@"http://getfavicon.appspot.com/{0}", websiteAddress);
-           // string faviconGrab = string.Format(websiteAddress + "favicon.ico");
-           // string faviconGrab = string.Format(@"http://www.google.com/s2/favicons?domain={0}", websiteAddress);
-            //string faviconGrab = string.Format(@"http://grabicon.com/", websiteAddress);
 
-            string faviconGrab = string.Format(@"http://grabicon.com/icon?domain={0}&size=46", websiteAddress);
-            if (File.Exists(fileSavePath))
-            { 
+            if (File.Exists(fileSavePath)) 
+            {
                 return true;
             }
             else
             {
-                try
+                if (System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
                 {
-                    using (WebClient webClient = new WebClient())
+                    string faviconGrab = string.Format(@"http://grabicon.com/icon?domain={0}&size=46", websiteAddress);
+                    try
                     {
-                        webClient.Proxy = null;
+                        using (WebClient webClient = new WebClient())
+                        {
+                            WebBrowser webBrowser = new WebBrowser();
 
-                        webClient.DownloadFile(faviconGrab, fileSavePath);
-                        return true;
+                            webBrowser.Navigate(new Uri("http://" + websiteAddress));
+                            webBrowser.Refresh();
+                            HtmlDocument doc = webBrowser.Document;
+
+                            HtmlElementCollection collectionOfHtmlElements = doc.GetElementsByTagName("link");
+
+                            HtmlElement oneToKeep;
+                            foreach (HtmlElement htmlElement in collectionOfHtmlElements)
+                            {
+                                string s = htmlElement.GetAttribute("href");
+                                if (s.Contains("favicon"))
+                                {
+                                    oneToKeep = htmlElement;
+                                    break;
+                                }
+                            }
+                            faviconGrab = string.Format(@"http://grabicon.com/icon?domain={0}&size=46", websiteAddress);
+                            webClient.Proxy = null;
+
+
+                            return true;
+                        }
                     }
-                }
-                catch (Exception e)
+                    catch (WebException webException)
+                    {
+                        using (WebClient webClient = new WebClient())
+                        {
+                            webClient.Proxy = null;
+
+                            webClient.DownloadFile(faviconGrab, fileSavePath);
+                            return true;
+                        }   
+                    }
+                    catch (Exception e)
+                    {
+                        Error error = new Error(e.ToString(), 3, null, DateTime.Now);
+                        error.InsertError();
+
+                        return false;
+                    }
+                } 
+                else 
                 {
-                    Error error = new Error(e.ToString(), 3, null, DateTime.Now);
-                    error.InsertError();
+                    MessageDialog.ErrorMessageBox("You are not connected to the internet.");
                     return false;
                 }
-            }
+            }       
         }
 
         private byte[] ImageToByteArray(Image image)
@@ -181,7 +217,7 @@ namespace PasswordProtector
             //string iconSaveName = "";
             string iconFilePath = "";
 
-        
+
             // Environment.CurrentDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             DirectoryInfo info = new DirectoryInfo(@".\src\Favicons\");
             /*if (websiteAssociate.Length > 7)
@@ -190,7 +226,7 @@ namespace PasswordProtector
 
                 iconFilePath = string.Format(@"{0}{1}.png",info.FullName, iconSaveName);
             }*/
-            iconFilePath = string.Format(@"{0}{1}.png", info.FullName,this.websiteAssociate);
+            iconFilePath = string.Format(@"{0}{1}.png", info.FullName, this.websiteAssociate);
             if (FetchWebsiteFavicon(websiteAssociate, iconFilePath))
             {
                 try
@@ -213,7 +249,7 @@ namespace PasswordProtector
             }
             else
             {
-                try 
+                try
                 {
                     iconFilePath = string.Format(@"{0}default.png", info.FullName);
                     using (var Stream = new FileStream(iconFilePath, FileMode.Open, FileAccess.Read))
@@ -232,7 +268,7 @@ namespace PasswordProtector
                     return null;
                 }
             }
-        
+
         }
 
 
@@ -284,14 +320,14 @@ namespace PasswordProtector
                         sqlCommand.Parameters.Add(new SqlParameter("@WebsiteAssociate", websiteAssociate));
                         sqlCommand.Parameters.Add(new SqlParameter("@WebsiteFavicon", ImageToByteArray(favicon)));
                         this.userID = sqlCommand.ExecuteScalar();
-                        sqlConnection.Close();  
+                        sqlConnection.Close();
                     }
-                    listOfCredentials.Add(new Tuple<Credential, Image>(this, favicon));  
+                    listOfCredentials.Add(new Tuple<Credential, Image>(this, favicon));
                 }
             }
             catch (Exception e)
             {
-                Error error = new Error(e.ToString(), 2, this.accountId, DateTime.Now);
+                Error error = new Error(e.ToString(), 2, accountId, DateTime.Now);
                 error.InsertError();
             }
         }
@@ -307,8 +343,8 @@ namespace PasswordProtector
                                                        " ,Type=@NewType,DateModified=@DateModified,WebsiteAssociate=@NewWebsiteAssociate,WebsiteFavicon=@NewFavicon From Credential Where ID = @ID", sqlConnection))
                     {
 
-                        string encryptedUsername = Cryptography.Encrypt(userName, Convert.ToString(Convert.ToInt32(this.accountId) * 3109));
-                        string encryptedPassword = Cryptography.Encrypt(password, Convert.ToString(Convert.ToInt32(this.accountId) * 3109));
+                        string encryptedUsername = Cryptography.Encrypt(userName, Convert.ToString(Convert.ToInt32(accountId) * 3109));
+                        string encryptedPassword = Cryptography.Encrypt(password, Convert.ToString(Convert.ToInt32(accountId) * 3109));
 
                         sqlCommand.Parameters.Add(new SqlParameter("@ID", this.userID));
                         sqlCommand.Parameters.Add(new SqlParameter("@NewUsername", encryptedUsername));
@@ -329,7 +365,7 @@ namespace PasswordProtector
             }
             catch (Exception e)
             {
-                Error error = new Error(e.ToString(), 2, this.accountId, DateTime.Now);
+                Error error = new Error(e.ToString(), 2, accountId, DateTime.Now);
                 error.InsertError();
                 return false;
             }
@@ -348,12 +384,12 @@ namespace PasswordProtector
                         sqlCommand.ExecuteNonQuery();
                         sqlConnection.Close();
                         return true;
-                    }  
+                    }
                 }
             }
             catch (Exception e)
             {
-                Error error = new Error(e.ToString(), 2, this.accountId, DateTime.Now);
+                Error error = new Error(e.ToString(), 2, accountId, DateTime.Now);
                 error.InsertError();
                 return false;
             }
@@ -376,7 +412,7 @@ namespace PasswordProtector
                             if (sqlDataReader.HasRows == true)
                             {
                                 while (sqlDataReader.Read())
-                                {   
+                                {
                                     var credential = new Credential
                                     {
                                         userID = Convert.ToString(sqlDataReader["ID"]).Trim(),

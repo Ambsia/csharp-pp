@@ -293,6 +293,14 @@ namespace PasswordProtector
                 {
                     MessageDialog.ErrorMessageBox("You must fill in all fields.");
                 }
+                else if (validate.StringLength(credentialToEdit.UserName) < 5 || validate.StringLength(credentialToEdit.UserPassword) < 5)
+                {
+                    MessageDialog.ErrorMessageBox("Username and password both need to be over 5 characters long.");
+                }
+                else if (!validate.ValidateWebsiteAddress())
+                {
+                    MessageDialog.ErrorMessageBox("Website address could not be validated");
+                }
                 else
                 {
                     credentialToEdit.EditCredential(index);
@@ -659,13 +667,12 @@ namespace PasswordProtector
         {
             //WebBrowser webBrowser1 = new WebBrowser();
             //string URL = @"https://idpedir.dmu.ac.uk/nidp/app/login?";
-            //string URL = @"http://youtube.com";
             //string user = "";
             //string pass = ".";
             //string authHdr = "Authorization: Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(user + ":" + pass)) + "\r\n";
 
             //webBrowser1.Url = new Uri(URL);
-            //webBrowser1.Navigate(URL,null,null,authHdr);
+            //webBrowser1.Navigate(URL, null, null, authHdr);
             //webBrowser1.Refresh();
 
             //string URLL = @"https://accounts.google.com/ServiceLogin?service=youtube";
@@ -692,6 +699,7 @@ namespace PasswordProtector
             //{
             //    try
             //    {
+
             //        doc = webBrowser1.Document;
             //        HtmlElement username = doc.GetElementById("Email");
             //        HtmlElement passsword = doc.GetElementById("Passwd");
@@ -713,7 +721,7 @@ namespace PasswordProtector
 
             //    }
             //}
-            System.Diagnostics.Process.Start("http://" + credential.WebsiteAssociate);
+            //System.Diagnostics.Process.Start("http://" + credential.WebsiteAssociate);
             //webBrowser1.Document.
             //   lblGoToWebsite.ForeColor = System.Drawing.ColorTranslator.FromHtml("#404040");
         }

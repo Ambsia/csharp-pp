@@ -38,7 +38,7 @@ namespace PasswordProtector
         {
             credential.UserName = txtUserName.Text;
             credential.UserPassword = txtPassword.Text;
-            credential.WebsiteAssociate = "http://" + txtWebsite.Text;
+            credential.WebsiteAssociate = txtWebsite.Text;
             credential.DateModified = now;
         }
 

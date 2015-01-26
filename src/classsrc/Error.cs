@@ -21,6 +21,8 @@ namespace PasswordProtector
         DateTime dateTimeOccured;
 
         string connectionString;
+        //really want to handle the exeception well here
+        //pass exeception and find out what it was
 
         public Error(string errorDescription, int errorRiskLevel, object userID, DateTime dateTimeOccured)
         {
