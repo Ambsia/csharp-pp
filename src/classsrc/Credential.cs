@@ -130,73 +130,54 @@ namespace PasswordProtector
         //string faviconGrab = string.Format(@"http://grabicon.com/", websiteAddress);
 
 
-        private bool FetchWebsiteFavicon(string websiteAddress, string fileSavePath)
-        {
-            WebRequest.DefaultWebProxy = null;
+        //private bool FetchWebsiteFavicon(string websiteAddress, string fileSavePath)
+        //{
+        //    WebRequest.DefaultWebProxy = null;
 
-            if (File.Exists(fileSavePath)) 
-            {
-                return true;
-            }
-            else
-            {
-                if (System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
-                {
-                    string faviconGrab = string.Format(@"http://grabicon.com/icon?domain={0}&size=46", websiteAddress);
-                    try
-                    {
-                        using (WebClient webClient = new WebClient())
-                        {
-                            WebBrowser webBrowser = new WebBrowser();
+        //    if (File.Exists(fileSavePath)) 
+        //    {
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        if (System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+        //        {
+        //            string faviconGrab;
+        //            try
+        //            {
+        //                using (WebClient webClient = new WebClient()) //first attempt, look for a favicon in the root
+        //                {
+        //                    webClient.Proxy = null;
+        //                    faviconGrab = string.Format(@"http://{0}/favicon.ico", websiteAddress);
+        //                    webClient.DownloadFile(faviconGrab, fileSavePath + ".ico");
+        //                    return true;
+        //                }
+        //            }
+        //            catch (WebException webException) // if the first attempt fails, let us use a website that finds us the favicon
+        //            {
+        //                using (WebClient webClient = new WebClient())
+        //                {
+        //                    faviconGrab = string.Format(@"http://grabicon.com/icon?domain={0}&size=46", websiteAddress);
+        //                    webClient.Proxy = null;
 
-                            webBrowser.Navigate(new Uri("http://" + websiteAddress));
-                            webBrowser.Refresh();
-                            HtmlDocument doc = webBrowser.Document;
-
-                            HtmlElementCollection collectionOfHtmlElements = doc.GetElementsByTagName("link");
-
-                            HtmlElement oneToKeep;
-                            foreach (HtmlElement htmlElement in collectionOfHtmlElements)
-                            {
-                                string s = htmlElement.GetAttribute("href");
-                                if (s.Contains("favicon"))
-                                {
-                                    oneToKeep = htmlElement;
-                                    break;
-                                }
-                            }
-                            faviconGrab = string.Format(@"http://grabicon.com/icon?domain={0}&size=46", websiteAddress);
-                            webClient.Proxy = null;
-
-
-                            return true;
-                        }
-                    }
-                    catch (WebException webException)
-                    {
-                        using (WebClient webClient = new WebClient())
-                        {
-                            webClient.Proxy = null;
-
-                            webClient.DownloadFile(faviconGrab, fileSavePath);
-                            return true;
-                        }   
-                    }
-                    catch (Exception e)
-                    {
-                        Error error = new Error(e.ToString(), 3, null, DateTime.Now);
-                        error.InsertError();
-
-                        return false;
-                    }
-                } 
-                else 
-                {
-                    MessageDialog.ErrorMessageBox("You are not connected to the internet.");
-                    return false;
-                }
-            }       
-        }
+        //                    webClient.DownloadFile(faviconGrab, fileSavePath);
+        //                    return true;
+        //                }   
+        //            }
+        //            catch (Exception e)
+        //            {
+        //                Error error = new Error(e.ToString(), 3, null, DateTime.Now);
+        //                error.InsertError();
+        //                return false;
+        //            }
+        //        } 
+        //        else 
+        //        {
+        //            MessageDialog.ErrorMessageBox("You are not connected to the internet.");
+        //            return false;
+        //        }
+        //    }       
+        //}
 
         private byte[] ImageToByteArray(Image image)
         {
@@ -214,62 +195,134 @@ namespace PasswordProtector
 
         private Image GetFavicon()
         {
+            DirectoryInfo info = new DirectoryInfo(@".\src\Favicons\");
+            string iconFilePath = string.Format(@"{0}", info.FullName);
+
+            WebRequest.DefaultWebProxy = null;
+
+            if (System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+            {
+                string faviconGrab;
+                try
+                {
+                    using (WebClient webClient = new WebClient()) //first attempt, look for a favicon in the root
+                    {
+                        webClient.Proxy = null;
+
+                        faviconGrab = string.Format(@"http://{0}/favicon.ico", websiteAssociate);
+                        iconFilePath += websiteAssociate + ".ico";
+                        webClient.DownloadFile(faviconGrab, iconFilePath);
+
+                        using (var Stream = new FileStream(iconFilePath, FileMode.Open, FileAccess.Read))
+                        {
+                            using (var Reader = new BinaryReader(Stream))
+                            {
+                                // put those bytes into a memory stream and "rewind" the memory stream
+                                return ByteArrayToImage(Reader.ReadBytes((int)Stream.Length));
+                            }
+                        }
+                    }
+                }
+                catch (WebException webException) // if the first attempt fails, let us use a website that finds us the favicon
+                {
+                    using (WebClient webClient = new WebClient())
+                    {
+                        webClient.Proxy = null;
+
+                        faviconGrab = string.Format(@"http://grabicon.com/icon?domain={0}&size=46", websiteAssociate);
+                        iconFilePath += websiteAssociate + ".png";
+                        webClient.DownloadFile(faviconGrab, iconFilePath);
+
+                        using (var Stream = new FileStream(iconFilePath, FileMode.Open, FileAccess.Read))
+                        {
+                            using (var Reader = new BinaryReader(Stream))
+                            {
+                                // put those bytes into a memory stream and "rewind" the memory stream
+                                return ByteArrayToImage(Reader.ReadBytes((int)Stream.Length));
+                            }
+                        }
+                    }
+                }
+                catch (Exception e) // if this fails all hope is lost.
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                MessageDialog.ErrorMessageBox("You are not connected to the internet.");
+                iconFilePath = string.Format(@"{0}default.png", info.FullName);
+                using (var Stream = new FileStream(iconFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    using (var Reader = new BinaryReader(Stream))
+                    {
+                        // put those bytes into a memory stream and "rewind" the memory stream
+                        return ByteArrayToImage(Reader.ReadBytes((int)Stream.Length));
+                    }
+                }
+
+            }
+        }
+       
+
+                 
+
             //string iconSaveName = "";
-            string iconFilePath = "";
+
 
 
             // Environment.CurrentDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            DirectoryInfo info = new DirectoryInfo(@".\src\Favicons\");
+            //DirectoryInfo info = new DirectoryInfo(@".\src\Favicons\");
             /*if (websiteAssociate.Length > 7)
             {
                 iconSaveName = websiteAssociate.Remove(0, 7);
 
                 iconFilePath = string.Format(@"{0}{1}.png",info.FullName, iconSaveName);
             }*/
-            iconFilePath = string.Format(@"{0}{1}.png", info.FullName, this.websiteAssociate);
-            if (FetchWebsiteFavicon(websiteAssociate, iconFilePath))
-            {
-                try
-                {
-                    using (var Stream = new FileStream(iconFilePath, FileMode.Open, FileAccess.Read))
-                    {
-                        using (var Reader = new BinaryReader(Stream))
-                        {
-                            // put those bytes into a memory stream and "rewind" the memory stream
-                            return ByteArrayToImage(Reader.ReadBytes((int)Stream.Length));
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Error error = new Error(e.ToString(), 3, null, DateTime.Now);
-                    error.InsertError();
-                    return null;
-                }
-            }
-            else
-            {
-                try
-                {
-                    iconFilePath = string.Format(@"{0}default.png", info.FullName);
-                    using (var Stream = new FileStream(iconFilePath, FileMode.Open, FileAccess.Read))
-                    {
-                        using (var Reader = new BinaryReader(Stream))
-                        {
-                            // put those bytes into a memory stream and "rewind" the memory stream
-                            return ByteArrayToImage(Reader.ReadBytes((int)Stream.Length));
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Error error = new Error(e.ToString(), 3, null, DateTime.Now);
-                    error.InsertError();
-                    return null;
-                }
-            }
+            //iconFilePath = string.Format(@"{0}{1}", info.FullName, this.websiteAssociate);
+            //if (FetchWebsiteFavicon(websiteAssociate, iconFilePath))
+            //{
+        //    try
+        //    {
+        //        using (var Stream = new FileStream(iconFilePath, FileMode.Open, FileAccess.Read))
+        //        {
+        //            using (var Reader = new BinaryReader(Stream))
+        //            {
+        //                // put those bytes into a memory stream and "rewind" the memory stream
+        //                return ByteArrayToImage(Reader.ReadBytes((int)Stream.Length));
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Error error = new Error(e.ToString(), 3, null, DateTime.Now);
+        //        error.InsertError();
+        //        return null;
+        //    }
+        //    }
+        //    else
+        //    {
+        //        try
+        //        {
+        //            iconFilePath = string.Format(@"{0}default.png", info.FullName);
+        //            using (var Stream = new FileStream(iconFilePath, FileMode.Open, FileAccess.Read))
+        //            {
+        //                using (var Reader = new BinaryReader(Stream))
+        //                {
+        //                    // put those bytes into a memory stream and "rewind" the memory stream
+        //                    return ByteArrayToImage(Reader.ReadBytes((int)Stream.Length));
+        //                }
+        //            }
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            Error error = new Error(e.ToString(), 3, null, DateTime.Now);
+        //            error.InsertError();
+        //            return null;
+        //        }
+        //    }
 
-        }
+        //}
 
 
         public Image GetImage(int index)
